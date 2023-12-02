@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage> {
   void onButtonTap(String value) {
     if (value != Btn.dot && int.tryParse(value) == null) {
       if (operand.isNotEmpty && numberTwo.isNotEmpty) {
-        // TODO
+        // TODO: implement the functionality of the calculator here.
       }
 
       operand = value;
