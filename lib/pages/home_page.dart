@@ -93,18 +93,130 @@ class _HomePageState extends State<HomePage> {
   }
 
   void onButtonTap(String value) {
-    if (value != Btn.dot && int.tryParse(value) == null) {
-      if (operand.isNotEmpty && numberTwo.isNotEmpty) {
-        // TODO: implement the functionality of the calculator here.
-      }
+    if (value == Btn.del) {
+      delete();
+      return;
+    }
 
-      operand = value;
+    if (value == Btn.clr) {
+      clearAll();
+      return;
+    }
+
+    if (value == Btn.per) {
+      convertToPercentage();
+      return;
+    }
+
+    if (value == Btn.calculate) {
+      calculate();
+      return;
+    }
+    appendValue(value);
+  }
+
+  void calculate() {
+    if (numberOne.isEmpty) return;
+    if (operand.isEmpty) return;
+    if (numberTwo.isEmpty) return;
+
+    double numOne = double.parse(numberOne);
+    double numTwo = double.parse(numberTwo);
+
+    var result = 0.0;
+    switch (operand) {
+      case Btn.add:
+        result = numOne + numTwo;
+        break;
+      case Btn.subtract:
+        result = numOne - numTwo;
+        break;
+
+      case Btn.multiply:
+        result = numOne * numTwo;
+        break;
+
+      case Btn.divide:
+        if (numberTwo == '0') return;
+        result = numOne / numTwo;
+        break;
+
+      default:
     }
 
     setState(() {
-      numberOne += value;
-      operand += value;
-      numberTwo += value;
+      numberOne = "$result";
+      if (numberOne.endsWith(".0")) {
+        numberOne = numberOne.substring(0, numberOne.length - 2);
+      }
+
+      operand = "";
+      numberTwo = "";
     });
+  }
+
+  // converts output to %
+  void convertToPercentage() {
+    // ex: 432+434
+    if (numberOne.isNotEmpty && operand.isNotEmpty && numberTwo.isNotEmpty) {
+      // calculate before converting
+      calculate();
+    }
+
+    if (operand.isNotEmpty) {
+      // can't be converted
+      return;
+    }
+
+    final number = double.parse(numberOne);
+    setState(() {
+      numberOne = "${(number / 100)}";
+      operand = "";
+      numberTwo = "";
+    });
+  }
+
+  void clearAll() {
+    setState(() {
+      numberOne = "";
+      operand = "";
+      numberTwo = "";
+    });
+  }
+
+  void delete() {
+    if (numberTwo.isNotEmpty) {
+      numberTwo = numberTwo.substring(0, numberTwo.length - 1);
+    } else if (operand.isNotEmpty) {
+      operand = "";
+    } else if (numberOne.isNotEmpty) {
+      numberOne = numberOne.substring(0, numberOne.length - 1);
+    }
+
+    setState(() {});
+  }
+
+  void appendValue(String value) {
+    if (value != Btn.dot && int.tryParse(value) == null) {
+      if (operand.isNotEmpty && numberTwo.isNotEmpty) {
+        calculate();
+      }
+
+      operand = value;
+    } else if (numberOne.isEmpty || operand.isEmpty) {
+      if (value == Btn.dot && numberOne.contains(Btn.dot)) return;
+      if (value == Btn.dot && (numberOne.isEmpty || numberOne == Btn.n0)) {
+        value = "0.";
+      }
+      numberOne += value;
+    } else if (numberTwo.isEmpty || operand.isNotEmpty) {
+      if (value == Btn.dot && numberTwo.contains(Btn.dot)) return;
+      if (value == Btn.dot && (numberTwo.isEmpty || numberTwo == Btn.n0)) {
+        value = "0.";
+      }
+      numberTwo += value;
+    }
+
+    setState(() {});
   }
 }
